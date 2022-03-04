@@ -33,13 +33,10 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-
-  <a href="//github.com/ericdmoore/sinclair"
+    <a href="//github.com/ericdmoore/sinclair"> 
     <img src="/images/sinclair.gif" alt="Baby Sinclair From the Cult classic Americna 90s TV show Dinosaurs">
-  </a>
-
+    </a>
   <h3 align="center">sinclair</h3>
-
   <p align="center">
     A babyish attempt at converting npm modules to becoming deno compatible
     <br />
