@@ -34,7 +34,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/ericdmoore/sinclair"
-    <img src="https://i.giphy.com/OUKCUp9wO8a52.gif" width="80" height="80"  alt="Baby Sinclair From the Cult classic Americna 90's TV show Dinosaurs">
+    <img src="/images/sinclair.gif" width="80" height="80"  alt="Baby Sinclair From the Cult classic Americna 90's TV show Dinosaurs">
   </a>
 
   <h3 align="center">sinclair</h3>
@@ -135,7 +135,12 @@ This section should list any major frameworks/libraries used to bootstrap your p
 This is an example of how you may give instructions on setting up your project locally.
 To get a local copy up and running follow these simple example steps.
 
-### Prerequisites
+### Assumptions & Warnings
+
+1. This process changes your repository in place
+2. It is highly recommended that you run this process in it's own branch
+3. The goal is to get better at handling specific translation stuff: eg: `fs`, `path`, `proc`, etc... better over time - so far the strategy here is to "punt on 3rd down"
+
 
 This is an example of how to list things you need to use the software and how to install them.
 * npm
@@ -176,7 +181,25 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Process Overview
 
-coming soon
+3. ------------------
+4. Require -> import
+	1. const NAME = require('f') // f = file or NPM name
+	2. import NAME from 'f' // f needs to be a relative path or URL
+	3. Adjust NPM name to be relative import to the `node_modules` folder
+	4. find - replace
+		1. find ::  `from '([^\.].+)'` 
+		2. replace::  `from '../../$1/index.js'`
+5. Named Exports - exports -> export
+	1. module.exports.NAME = // CJS
+	2. export const NAME =  // ESM
+	3. `module.exports.` becomes `export const `
+6. Default Exports - module.export =  -> export default
+	1. module.export = {{token}}
+	2. export default {{token}}
+	3. `module.export = ` becomes `export default `
+	4. if no default, then keep track of the the exported things, and plop them all in an default object
+
+
 
 
 <!-- ROADMAP -->
