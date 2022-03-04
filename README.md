@@ -33,8 +33,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/ericdmoore/sinclair"
-    <img src="/images/sinclair.gif" width="80" height="80"  alt="Baby Sinclair From the Cult classic Americna 90's TV show Dinosaurs">
+
+  <a href="//github.com/ericdmoore/sinclair"
+    <img src="/images/sinclair.gif" alt="Baby Sinclair From the Cult classic Americna 90s TV show Dinosaurs">
   </a>
 
   <h3 align="center">sinclair</h3>
