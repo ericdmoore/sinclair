@@ -1,26 +1,6 @@
-<!-- # sinclair -->
-<!-- A babyish attempt at converting npm modules to becoming deno compatible -->
-
-
 <div id="top"></div>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
 <!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
+<!-- Reference links are enclosed in brackets [ ] instead of parentheses () -->
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -28,9 +8,9 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
 <!-- PROJECT LOGO -->
+<!-- # sinclair -->
+<!-- A babyish attempt at converting npm modules to becoming deno compatible -->
 <br />
 <div align="center">
     <a href="//github.com/ericdmoore/sinclair"> 
@@ -51,16 +31,14 @@
   </p>
 </div>
 
-
-
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#why">Why</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#about-the-project">About The Project</a></li>
       </ul>
     </li>
     <li>
@@ -71,6 +49,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Process Overview</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -79,50 +58,36 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 ## Why
 
-So you started messing around with deno, cool me too, and you wanted to grab some awesome_node_modules that you used before, cool me too, and then you ran into the step change assumptions from @ry - and noow everythihg is better - but i have all this stuff I want to being with me to the new world.
-
-
-#### namesake:
-
-There was an American TV show in the 90's that had a baby dinosaur that would say adorable things like "Im the baby gotta love me" - his name was Sinclair. Now you know.
-
+So you started messing around with deno, cool me too. But you keep wondering how to grab some `awesome_node_modules` that you used before? Cool, me too! congratualations you and every other deno-saur have ran into the step change assumptions from @ry - and noow everythihg is better (I think),but I have all this baggage of stuff I want to bring with me to the **new world**.
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+This project is intended to work with `denopkg.com` and `raw.githubusercontent.com` as such, the node_modules need to be made public. so that relative URL import/exports will work.
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
+That is why this project exists. To help package users quickly migrate old and beloved packages to the new world.
+
+It accomplishes this by:
+- Checking in all `node_modules` so they are visible via github, or other SCM
+- Then we ensure all deps in node_modules use es6 import/export + default exports
+
 
 Here's why:
 * Your time should be focused on creating something amazing. A project that solves a problem and helps others
 * You shouldn't be doing the same tasks over and over like creating a README from scratch
 * You should implement DRY principles to the rest of your life :smile:
 
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
-
-Use the `BLANK_README.md` to get started.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 ### Built With
 
 This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
+* [Typescript](https://www.typescriptlang.org/)
+* [Deno](https://deno.land/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -130,8 +95,15 @@ This section should list any major frameworks/libraries used to bootstrap your p
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+```zsh
+cd someNodeProjectjs
+deno run http://denopkg.com/ericdmoore/sinclair/mod.ts
+```
+
+```zsh
+cd someNodeProjectjs
+npx @ericdmoore/sinclair
+```
 
 ### Assumptions & Warnings
 
@@ -139,12 +111,6 @@ To get a local copy up and running follow these simple example steps.
 2. It is highly recommended that you run this process in it's own branch
 3. The goal is to get better at handling specific translation stuff: eg: `fs`, `path`, `proc`, etc... better over time - so far the strategy here is to "punt on 3rd down"
 
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
 
 ### Installation
 
@@ -179,43 +145,38 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Process Overview
 
-3. ------------------
-4. Require -> import
+1. Require -> import
 	1. const NAME = require('f') // f = file or NPM name
 	2. import NAME from 'f' // f needs to be a relative path or URL
 	3. Adjust NPM name to be relative import to the `node_modules` folder
 	4. find - replace
 		1. find ::  `from '([^\.].+)'` 
 		2. replace::  `from '../../$1/index.js'`
-5. Named Exports - exports -> export
+1. Named Exports - exports -> export
 	1. module.exports.NAME = // CJS
 	2. export const NAME =  // ESM
 	3. `module.exports.` becomes `export const `
-6. Default Exports - module.export =  -> export default
+1. Default Exports - module.export =  -> export default
 	1. module.export = {{token}}
 	2. export default {{token}}
 	3. `module.export = ` becomes `export default `
 	4. if no default, then keep track of the the exported things, and plop them all in an default object
 
 
-
-
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
+- [ ] Add Changelog
+- [ ] Investigate using [`tsd-jsdoc`](https://dev.to/jor/jsdoc-to-typescript-declaration-19fg) for JSDoc Types to Typescript Conversions
+- [ ] Add Ref Docs
+- [ ] Add Explanation Docs
+- [ ] Add Tutorials Docs
+- [ ] Add How-To-Guides Docs
 - [ ] Multi-language Support
     - [ ] Chinese
     - [ ] Spanish
 
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -225,33 +186,31 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-1. Fork the Project
+<!-- 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+5. Open a Pull Request -->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+MIT © Eric D Moore
+
+See [`LICENSE`](./LICENSE) for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 <!-- CONTACT -->
 ## Contact
 
-Eric D Moore - [@ericdmoore](https://twitter.com/ericdmoore) - eric@☕️.kz
+Eric D Moore | [🐦 @ericdmoore](https://twitter.com/ericdmoore) | [📧  eric@☕️.kz](mailto:eric@☕️.kz) | 🌎 Dallas, TX
 
 Project Link: [https://github.com/ericdmoore/sinclair](https://github.com/ericdmoore/sinclair)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
@@ -265,9 +224,13 @@ Use this space to list resources you find helpful and would like to give credit 
 * [Img Shields](https://shields.io)
 * [GitHub Pages](https://pages.github.com)
 * [Font Awesome](https://fontawesome.com)
-* [React Icons](https://react-icons.github.io/react-icons/search)
+* [Readme Template ](https://github.com/othneildrew/Best-README-Template)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+#### namesake:
+
+There was an American TV show in the 90's that had a baby dinosaur that would say adorable things like "Im the baby gotta love me" - his name was Sinclair. Now you know.
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
@@ -285,4 +248,3 @@ Use this space to list resources you find helpful and would like to give credit 
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/othneildrew
 [product-screenshot]: images/screenshot.png
-
