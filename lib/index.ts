@@ -1,43 +1,91 @@
+import type {ParsedPath} from 'path' 
+
+import findDependentSourceFiles from './getFiles'
+
 import {readFile, writeFile} from 'fs/promises'
-import {resolve} from 'path'
-import getFiles from './getFiles'
+import {resolve, basename, extname, parse} from 'path' 
+
+/**
+ * Print Lines
+ * @param lines - how manby lines?
+ * @param offsetIdx - start with some offset?
+ */
+const printLines  = (lines =10, offsetIdx =0)=> (initS: string)=>{
+    console.log( 
+        initS.slice(offsetIdx)
+        .split('\n')
+        .slice(0,lines)
+        .join('\n'),
+        '\n...','\n...','\n' 
+    )
+}
+
+const mountPath = (mountDir:string, p: (s:string)=> ParsedPath)=>(path: string)=>{
+    mountDir = resolve(mountDir)
+    const pp = p(path)
+    const dir = pp.dir.slice(mountDir.length)
+    
+    return {
+        path,
+        mount:{
+            root: mountDir,
+            dir,
+            depth: dir.split('/').length
+        },
+        ...pp
+    }
+}
+
 
 (async ()=>{
-    const requireStmt = /const|let|var *({?.+}?) *= *require\((.+)\)/gi
-    const namedExportStmt = /exports.(.+)[ ]*=/gi
-    const namedModuleExportStmt = /module.exports.(.+)[ ]*=/gi
 
-    const defaultExportStmt = /exports[ ]* =/gi
-    const defaultModuleExportStmt = /module.exports[ ]*=/gi
+    const deps = mountPath('./node_modules/', parse)
 
-    const acornBinPath = resolve('./node_modules/acorn/dist/bin.js')
+    for await (const path of findDependentSourceFiles(resolve('./package.json'), 'node_modules/')){
+        console.log(deps(path))
+    }
+    
+    // const requireStmt = /const|let|var *(\{?\S+\}?) *= *require\((.+)\);?/gi
+    const classesStmt = /class *(\S+) *extends *(\S+) *\{/gi
+    const requireStmt = /[^\*] *const|let|var *\{?(\b)\}? *= *require\(['"](\b)['"]\);?/gi
+    const namedExportStmt = /exports\.(\S+) *= *(\S+);?/gi
+    const namedModuleExportStmt = /module.exports\.(\S+) *= *(\S+);?/gi  // FYI - module is reserve word in d.ts files
+
+    const defaultEs6ExportStmt = /exports += +(\S+);?/gi
+    const defaultModuleExportStmt = /module.exports *= *(\S+);?/gi
+
+    const acornBinPath = resolve('./node_modules/acorn/dist/acorn.js')
+    const argPath = resolve('./node_modules/arg/index.js')
+
     const acornS = (await readFile(acornBinPath)).toString()
+    const argS = (await readFile(argPath)).toString()
     
-    // const matches = [...acornS.matchAll(requireStmt)].forEach( m => {
-    //     const [line, importToken, fromToken] = m
-    //     console.log({line, importToken, fromToken, index: m.index, groups: m.groups})
-    // })
 
-    const replaced = acornS.replaceAll(requireStmt, 'import $1from $2')
-    console.log( replaced.split('\n').slice(0,15).join('\n'), '\n...','\n...','\n' )
+    const namedExports = [...acornS.matchAll(namedExportStmt)].map( m => {
+        const [line, exportName, exportval] = m
+        return {line, exportName, exportval, index: m.index, groups: m.groups}
+    })
     
-    // const [match, importToken, fromToken ] = [...requireStmt.exec(acornS)]
-    // console.log({match, importToken, fromToken})     
+    const namedModuleExports = [...acornS.matchAll(namedModuleExportStmt)].map( m => {
+        const [line, exportName, exportval] = m
+        return {line, exportName, exportval, index: m.index, groups: m.groups}
+    })
 
-    // [line, importToken, fromToken, index, ogInput]
-    // console.log({index, line, importToken, fromToken})
+    const defaultExports = [...acornS.matchAll(defaultModuleExportStmt)].map( m => {
+        const [line, exportval] = m
+        return {line, exportval, index: m.index, groups: m.groups}
+    })
 
-    // for await (const n of getFiles('./')){
-    //     
-    //     const lines = (await readFile(n)).toString().split('\n')
+    const defaultEs6Export = [...acornS.matchAll(defaultEs6ExportStmt)].map(m=>{
+        const [line, exportval] = m
+        return {line, exportval, index: m.index, groups: m.groups}
+    })
 
-    //     if(lines.some(l => requireStmt.test(l))){
-    //         console.log(n)
-    //         lines.forEach(l=>{
-    //             for(const m of l.matchAll(requireStmt)){
-    //                 console.log(m)
-    //             }
-    //         })
-    //     }
-    // }
+    const es6IMportExports = acornS
+        .replaceAll(requireStmt, 'import $1from $2')
+        .replaceAll(namedModuleExportStmt,'export const $1 = $2;')
+        .replaceAll(namedExportStmt,'export const $1 = $2;')
+    
+    console.log({defaultExports, namedExports, namedModuleExports, defaultEs6Export})
+    printLines()(es6IMportExports)
 })()

@@ -74,14 +74,7 @@ It accomplishes this by:
 - Checking in all `node_modules` so they are visible via github, or other SCM
 - Then we ensure all deps in node_modules use es6 import/export + default exports
 
-
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 ### Built With
 
@@ -90,7 +83,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 * [Typescript](https://www.typescriptlang.org/)
 * [Deno](https://deno.land/)
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 
 <!-- GETTING STARTED -->
@@ -131,7 +124,7 @@ _Below is an example of how you can instruct your audience on installing and set
    const API_KEY = 'ENTER YOUR API';
    ```
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 
 
@@ -142,7 +135,7 @@ Use this space to show useful examples of how a project can be used. Additional 
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 ## Process Overview
 
@@ -163,12 +156,26 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 	3. `module.export = ` becomes `export default `
 	4. if no default, then keep track of the the exported things, and plop them all in an default object
 
-
 <!-- ROADMAP -->
 ## Roadmap
 
 - [ ] Add Changelog
 - [ ] Investigate using [`tsd-jsdoc`](https://dev.to/jor/jsdoc-to-typescript-declaration-19fg) for JSDoc Types to Typescript Conversions
+  - https://github.com/otris/jsdoc-tsd
+  - https://github.com/paulfisher53/tsd-jsdoc
+  - https://github.com/englercj/tsd-jsdoc
+- [ ] Investigate a Parsing Strategy 
+  - allows more intelligance for when + how to parse. 
+  - consider acorn/babel seem like the top two considerations.
+  - for example: 
+    - dont mess with the file if it has a module factory IFFE that is taking care of the multi-module pattern
+    - this requires a sentinel to know when to / when not to mutate the source code
+      - sentinel: `__esModule`
+    - consider using `package.json` since its easy to parse and also required/ubiquitous
+  - Other Issue: 
+    - for files with a default export + and export values equal to the name given in the export statement, 
+    - we actually have to remove the export declation - simply export the value.
+    - `export const Apple = Apple` - is a redclaration of a potentially pre-existing const
 - [ ] Add Ref Docs
 - [ ] Add Explanation Docs
 - [ ] Add Tutorials Docs
@@ -177,7 +184,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - [ ] Chinese
     - [ ] Spanish
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -187,13 +194,7 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-<!-- 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request -->
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 <!-- LICENSE -->
 ## License
@@ -202,16 +203,16 @@ MIT © Eric D Moore
 
 See [`LICENSE`](./LICENSE) for more information.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 <!-- CONTACT -->
 ## Contact
 
-Eric D Moore | [🐦 @ericdmoore](https://twitter.com/ericdmoore) | [📧  eric@☕️.kz](mailto:eric@☕️.kz) | 🌎 Dallas, TX
+Eric D Moore | [🐦 @ericdmoore](https://twitter.com/ericdmoore) | 📧  eric@☕️.kz | 🌎 [Dallas, TX](https://www.visitdallas.com/)
 
 Project Link: [https://github.com/ericdmoore/sinclair](https://github.com/ericdmoore/sinclair)
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+<p align="right">[<a href="#top">🔝</a>]</p>
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments

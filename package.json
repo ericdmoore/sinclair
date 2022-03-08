@@ -1,29 +1,35 @@
 {
+ 
+  "name": "sinclair",
+  "description": "sinclair : A babyish attempt at converting npm modules to becoming deno compatible",
+  "homepage": "https://github.com/ericdmoore/sinclair#readme",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "getopts": "^2.3.0"
+  },
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "getopts": "^2.3.0",
     "ts-node": "^10.6.0",
     "typescript": "^4.6.2"
   },
-  "name": "sinclair",
-  "description": "<!-- # sinclair --> <!-- A babyish attempt at converting npm modules to becoming deno compatible -->",
-  "version": "1.0.0",
-  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
-  "_type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ericdmoore/sinclair.git"
+  "author": {
+    "email": "eric@xn--53h.kz",
+    "name": "Eric D Moore",
+    "url": "http://github.com/ericdmoore"
   },
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ericdmoore/sinclair/issues"
   },
-  "homepage": "https://github.com/ericdmoore/sinclair#readme"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ericdmoore/sinclair.git"
+  }
 }
