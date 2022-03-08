@@ -15,11 +15,6 @@ const isValidDir = async(s:string):Promise<boolean> => {
     return d.isDirectory()
 }
 
-const importJSON = async (path:string):Promise<unknown>=>{
-    const b = await readFile(resolve(path))
-    return JSON.parse(b.toString())
-}
-
 const ObjectMap = (k?: S2S, v?: U2U) => (o:object) => {
     const i = <T>(i:T) => {return i}
     const defaultedKeyMapper: S2S = k ?? i
@@ -31,6 +26,11 @@ const ObjectMap = (k?: S2S, v?: U2U) => (o:object) => {
             ([k,v])=>[defaultedKeyMapper(k), defaultedValMapper(v)]
         )
     )
+}
+
+const importJSON = async (path:string):Promise<unknown>=>{
+    const b = await readFile(resolve(path))
+    return JSON.parse(b.toString())
 }
 
 const loadDepsRecursive = async (pkgJsonPath:string, key: 'devDependencies' | 'dependencies' = 'dependencies' ):Promise<string[]>=>{
@@ -51,7 +51,6 @@ const loadDepsRecursive = async (pkgJsonPath:string, key: 'devDependencies' | 'd
         ))
     ])]
 }
-    
 
 export const findDependentSourceFiles = async function* (
     topPkgJsonPath: string,
