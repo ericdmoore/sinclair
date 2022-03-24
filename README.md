@@ -160,13 +160,28 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Roadmap
 
 - [ ] Add Changelog
+- [ ] Investigate Prior Art
+  - https://github.com/rollup/plugins/tree/master/packages/commonjs
+  - https://github.com/wessberg/cjstoesm#api-usage
+  - https://github.com/coderaiser/putout#-convert-commonjs-to-esm
+  
 - [ ] Investigate using [`tsd-jsdoc`](https://dev.to/jor/jsdoc-to-typescript-declaration-19fg) for JSDoc Types to Typescript Conversions
   - https://github.com/otris/jsdoc-tsd
   - https://github.com/paulfisher53/tsd-jsdoc
   - https://github.com/englercj/tsd-jsdoc
 - [ ] Investigate a Parsing Strategy 
-  - allows more intelligance for when + how to parse. 
-  - consider acorn/babel seem like the top two considerations.
+  - Regex vs AST
+  - allows more intelligance for when + how to parse.   
+  - consider 
+    - acorn
+    - babel
+      - https://krasimirtsonev.com/blog/article/transpile-to-esm-with-babel
+      - https://www.npmjs.com/package/babel-plugin-add-module-exports
+    - [esprima](https://github.com/jquery/esprima) 
+      - https://github.com/estools/esquery
+      - https://github.com/estools/escodegen
+    - [putout](https://github.com/coderaiser/putout)
+      
   - for example: 
     - dont mess with the file if it has a module factory IFFE that is taking care of the multi-module pattern
     - this requires a sentinel to know when to / when not to mutate the source code
