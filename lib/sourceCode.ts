@@ -51,16 +51,50 @@ export const acorn = {
 	},
 };
 
-(async () => {
-	console.log(
-		JSON.stringify(
-			await acorn.ecmaParse({src: 'const myA4 = require("asdf4")("arity1Param")("arity2Param")', file: 'somefakeFile.js'}),
-			null,
-			2,
-		),
-	);
-})();
+// (async () => {
+// 	console.log(
+// 		JSON.stringify(
+// 			await acorn.ecmaParse({
+// 				file: 'somefakeFile.js',
+// 				src: 'import {a1, b1} from \'objectPattern\'', 
+// 			}),
+// 			null,
+// 			2,
+// 		),
+// 	);
+// })();
 
 /*
+
+{
+      "type": "ImportDeclaration",
+      "specifiers": [
+        {
+          "type": "ImportSpecifier",
+          "imported": {
+            "type": "Identifier", "name": "a1"
+          },
+          "local": {
+            "type": "Identifier", "name": "a1"
+          }
+        },
+        {
+          "type": "ImportSpecifier",
+          "imported": {
+            "type": "Identifier", "name": "b1"
+          },
+          "local": {
+            "type": "Identifier", "name": "b1"
+          }
+        }
+      ],
+      "source": {
+        "type": "Literal",
+        "value": "objectPattern",
+        "raw": "'objectPattern'"
+      }
+    }
+
+
 
 */

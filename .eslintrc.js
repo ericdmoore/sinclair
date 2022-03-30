@@ -18,6 +18,7 @@ module.exports = {
 		'@typescript-eslint',
 	],
 	rules: {
+		quotes: ["error", "double"],
+		'quote-props':'as-needed'
 	},
 };
-

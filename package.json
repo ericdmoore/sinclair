@@ -3,52 +3,60 @@
     "description": "sinclair : A babyish attempt at converting npm modules to becoming deno compatible",
     "homepage": "https://github.com/ericdmoore/sinclair#readme",
     "version": "0.1.0",
-    "type": "module",
     "main": "index.js",
+    "scripts": {
+        "test": "npx nyc npx ts-node tests/tests.ts"
+    },
+    "license": "MIT",
     "dependencies": {
         "acorn": "^8.7.0",
         "acorn-loose": "^8.3.0",
+        "acorn-walk": "^8.2.0",
         "escodegen": "^2.0.0",
         "esquery": "^1.4.0",
         "getopts": "^2.3.0",
         "globby": "^13.1.1",
         "json-diff": "^0.7.3",
+        "lodash.clonedeep": "^4.5.0",
+        "lodash.get": "^4.4.2",
         "lodash.merge": "^4.6.2",
+        "lodash.set": "^4.3.2",
         "rehype-remark": "^9.1.2",
         "remark-rehype": "^10.1.0"
     },
     "devDependencies": {
+        "@istanbuljs/nyc-config-typescript": "^1.0.2",
         "@types/acorn": "^4.0.6",
         "@types/babel__core": "^7.1.18",
         "@types/escodegen": "^0.0.7",
         "@types/esquery": "^1.0.2",
         "@types/estree": "^0.0.51",
         "@types/globby": "^9.1.0",
+        "@types/globrex": "^0.1.1",
         "@types/json-diff": "^0.7.0",
+        "@types/lodash.clonedeep": "^4.5.6",
+        "@types/lodash.get": "^4.4.6",
         "@types/lodash.merge": "^4.6.6",
+        "@types/lodash.set": "^4.3.6",
         "@types/node": "^17.0.21",
         "@typescript-eslint/eslint-plugin": "^5.16.0",
         "@typescript-eslint/parser": "^5.16.0",
-        "acorn-walk": "^8.2.0",
         "esbuild": "^0.14.27",
         "eslint": "^8.10.0",
         "eslint-config-xo": "^0.40.0",
         "esm": "^3.2.25",
+        "globrex": "^0.1.2",
+        "nyc": "^15.1.0",
+        "source-map-support": "^0.5.21",
         "ts-node": "^10.6.0",
         "typescript": "^4.6.2"
     },
-    "directories": {
-        "lib": "lib"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
+    "directories": {"lib": "lib"},
     "author": {
         "email": "eric@xn--53h.kz",
         "name": "Eric D Moore",
         "url": "http://github.com/ericdmoore"
     },
-    "license": "ISC",
     "bugs": {
         "url": "https://github.com/ericdmoore/sinclair/issues"
     },

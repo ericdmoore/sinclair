@@ -5,7 +5,7 @@ import {createSelector} from '../createQuerySelector';
  * Type2
  * @param node
  */
-export const convertObjectPattern = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 	/**
      *
      * ```json from> "const {a1,  b1} = require('asd1')" // note> const {a1, ...b1} = require('CAN NOT BE TRANSLATED') - may not be valid NODE.js either

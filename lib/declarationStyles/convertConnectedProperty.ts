@@ -16,7 +16,7 @@ import {createSelector} from '../createQuerySelector';
  * @type3
  * @todo - determine behavior for type4
  */
-export const convertConnectedProperty = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 	/**
      *
      * ```json from> "const myA2 = require('asd2').key1"

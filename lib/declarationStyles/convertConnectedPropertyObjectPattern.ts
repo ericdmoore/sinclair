@@ -7,7 +7,7 @@ import {createSelector} from '../createQuerySelector';
  *
  * @param node
  */
-export const convertConnectedPropertyObjectPattern = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 	/**
      * ```json require
      * {
