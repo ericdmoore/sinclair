@@ -1,23 +1,30 @@
 
 import * as estree from 'estree';
-import {createSelector} from '../createQuerySelector';
-import get from 'lodash.get'
-import set from 'lodash.set'
+import {createSelector} from '../../createQuerySelector';
 import deepClone from 'lodash.clonedeep'
 import {full} from 'acorn-walk'
 import acorn from 'acorn';
+import get from 'lodash.get'
+import set from 'lodash.set'
 
-const findRequireName = (c: estree.CallExpression) : estree.Literal => {
-	// Dig if needed
-	if (c.callee.type === 'CallExpression') {
-		return findRequireName(c.callee as estree.CallExpression);
+const findRequireName = (c: estree.Node, i=0) : estree.SimpleLiteral => {
+	// pluck + recurse
+
+     if (c.type === 'CallExpression') {
+          const r = c.arguments.filter(a=> a.type === 'Literal' 
+                                             && !('regex' in a) 
+                                             && !('bigint' in a) 
+                                             ) as estree.SimpleLiteral[]
+          return r.length > 0 
+               ? r[0]
+               : findRequireName(c.callee, i+1)
 	}
 
-	// Pluck the require name
-	if (c.callee.type === 'Identifier' && (c.callee as estree.Identifier)?.name === 'require') {
-          return c.arguments[0] as estree.Literal;
-	}
+     if(c.type === 'MemberExpression'){
+          return findRequireName(c.object, i+1);
+     }
 
+     console.error(i, c, new Error().stack)
 	throw new Error('Need more logic branches for finding the require');
 };
 
@@ -54,7 +61,7 @@ export const replaceRequireFn = (replacer: estree.Identifier, programAST: estree
  *
  * @param node
  */
-export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.Node): estree.Node[] => {
 	/**
      * ```json require
      *     {
@@ -89,11 +96,11 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
      *               ],
      *               "callee": {
      *                 "type": "CallExpression",       // set this one to the new made up func
+     *                 "optional": false,
      *                 "callee": {                     // innerMost -> finds require -> stops descent
      *                   "type": "Identifier",
      *                   "name": "require"
-     *                 },
-     *                 "optional": false
+     *                 }
      *                 "arguments": [                  // pairs with args
      *                   {
      *                     "type": "Literal",
@@ -101,16 +108,17 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
      *                     "raw": "\"asdf4\""
      *                   }
      *                 ],
+     *                 
      *               }
-     *             },
+     *             }
      *           }
      *         }
-     *       ],
+     *       ]
      *     }
      * ```
      */
-
-	const declator: estree.VariableDeclarator = node.declarations
+     const n = node as estree.VariableDeclaration
+	const declator: estree.VariableDeclarator = n.declarations
 		.filter(d => d.type === 'VariableDeclarator')[0];
 
 	const outterCall = declator.init as estree.CallExpression;
@@ -118,7 +126,7 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 
 	const madeUpFunctionName:estree.Identifier = {
 		type: 'Identifier',
-		name: `${requireArgs.value ?? `__${Date.now()}`}__defaultFunc`,
+		name: `${requireArgs.value ?? `__${Date.now()}`}__default`,
 	};
 
 	const importing:estree.ImportDeclaration = {
@@ -133,7 +141,7 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 	};
 	const assigning : estree.VariableDeclaration = {
 		type: 'VariableDeclaration',
-		kind: node.kind,
+		kind: n.kind,
 		declarations: [{
 			type: 'VariableDeclarator',
 			id: declator.id as estree.Identifier,
@@ -141,6 +149,7 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 		}],
 
 	};
+
 	return [importing, assigning];
 };
 
@@ -149,7 +158,7 @@ const requireWithImpliedDefaultFunction = {
 	id: {init: {callee: {name: 'require'}}},
 };
 
-export const hasRequireFn = (n: estree.Node): boolean =>{
+export const hasRequireFn = (n: estree.Node): boolean => {
      switch(n.type){
           case 'Program':
                return n.body.some(s=>hasRequireFn(s))
@@ -183,3 +192,9 @@ export const selector = {
 	obj: requireWithImpliedDefaultFunction,
 	str: createSelector(requireWithImpliedDefaultFunction),
 };
+
+export const testNode = (node: estree.Node | estree.Node[]):boolean=>{
+     return !node || Array.isArray(node) 
+          ? false
+          : hasRequireFn(node)
+}

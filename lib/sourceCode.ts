@@ -2,99 +2,136 @@
 import {readFile} from 'fs/promises';
 
 import * as acornjs from 'acorn';
-// Import {full} from 'acorn-walk';
+import {fullAncestor} from 'acorn-walk';
+import * as estree from 'estree';
 import {generate} from 'escodegen';
 import {query} from 'esquery';
-import * as estree from 'estree';
+
 import {createSelector, JSish} from './createQuerySelector';
+import {stripStartEnd} from '../tests/_utils/stripLocFrom'
 // Import * as babeljs from "@babel/core";
 
-// const babelrc = require('../babel.config.js')
-// console.log({babelrc})
-
-// const configFile = resolve( './babel.config.js')
-// console.log({configFile})
-
-// export const loadedOpts =  babeljs.loadPartialConfig({ configFile}) ?? undefined
-// console.log({loadedOpts})
-
-// export const babelio = {
-//     parseFile : async (
-//         filename:string,
-//         opts: babel.TransformOptions | undefined )  =>
-//         babeljs.transformFileAsync(filename, babelrc),
-//     parseString : async (str: string, opts: babel.TransformOptions) =>
-//          babeljs.transformAsync(str, {...opts, configFile, ...babelrc} ),
-//     astToString : async (ast:babel.Node, code:string, opts: babel.TransformOptions) =>
-//         babeljs.transformFromAstAsync(ast, code, opts),
-//     convertExportstoES6:  async (i: {ast:babel.Node, code:string, opts: babel.TransformOptions}) =>
-//         { return i },
-//     addDefaultExport:  async (i: {ast:babel.Node, code:string, opts: babel.TransformOptions}) =>
-//         { return i },
-// }
-
-export type AcornRootNode = acornjs.Node & {body: acornjs.Node[], sourceType: Pick<acornjs.Options, 'sourceType'>}
+type Dict<T> = {[key:string]:T}
+type INodeTester = (
+  node: estree.Node | estree.Node[], 
+  tree: Readonly<estree.Program>,
+  curPathSegs: string[], 
+  ancestors: Array<estree.Node | estree.Node[]>,
+  existing: Dict<estree.Node | estree.Node[]>) => boolean
 
 export const acorn = {
-	async toCodeString(i:{tree: AcornRootNode }):Promise<string> {
-		return generate(i.tree);
-	},
-	async query(ast: estree.Node, q: string | JSish) {
+	toCodeString: async (i:estree.Program ) => generate(i),
+	async query(ast: estree.Program, q: string | JSish) {
 		const q_ = typeof q === 'string' ? q : createSelector(q);
 		return query(ast, q_);
 	},
-	async ecmaParse(i: {src?:string, file:string}) : Promise<AcornRootNode> {
+	async ecmaParse(i: {src?:string, file:string}) : Promise<estree.Program> {
 		const src = i.src ? i.src : (await readFile(i.file)).toString();
-
-		const node = acornjs.parse(src, {ecmaVersion: 12, sourceType: 'module', sourceFile: i.file});
-		return Promise.resolve(node as acornjs.Node & {body:acornjs.Node[], sourceType: Pick<acornjs.Options, 'sourceType'> });
+		const node = acornjs.parse(src, {
+      ecmaVersion: 12, 
+      sourceType: 'module', 
+      sourceFile: i.file,
+      ranges: false,
+      locations: false,
+    });
+		return node as unknown as estree.Program
 	},
+  async findNodePaths(
+    ast: Readonly<estree.Program>,
+    testFn: INodeTester,
+    node?: estree.Node | estree.Node[],
+    curPathSeg: string[] = [],
+    ancestors: Array<estree.Node | estree.Node[]> = [],
+    existing: Dict<estree.Node | estree.Node[]> = {}
+  ):Promise<Dict<estree.Node | estree.Node[]>>{
+    
+    ancestors.length===0 && ancestors.push(ast)
+    const curNode: estree.Node | estree.Node[] = node ?? ast
+    
+    if(Array.isArray(curNode)){
+      // add the array to the result?
+      if(testFn(curNode, ast, curPathSeg, ancestors, existing)){
+        existing = {...existing, [curPathSeg.join('/')]: curNode}
+      }
+      // iterate + recurse
+      for(let i = 0; i < curNode.length; i++){ 
+        const nextNode = curNode[i]
+        const key = i.toString()        
+        if(typeof nextNode ==='object'){
+          existing = {
+            ...existing,
+            ...await acorn.findNodePaths(ast, testFn, nextNode, curPathSeg.concat([key]), ancestors.concat([nextNode]), existing)
+          }
+        }
+      }
+    } else {
+      // add the object to the result?
+      if(testFn(curNode, ast, curPathSeg, ancestors, existing)){
+        existing = {...existing, [curPathSeg.join('/')]: curNode}
+      }
+      // iterate + recurse
+      for(const key in curNode){
+        const nxtNode = (curNode as any)[key]
+        if(typeof nxtNode ==='object'){
+          existing = {
+            ...existing,
+            ...await acorn.findNodePaths(ast, testFn, nxtNode, curPathSeg.concat([key]), ancestors.concat([nxtNode]), existing)
+          }
+        }
+      }
+    }
+    return existing
+  }
 };
 
-// (async () => {
-// 	console.log(
-// 		JSON.stringify(
-// 			await acorn.ecmaParse({
-// 				file: 'somefakeFile.js',
-// 				src: 'import {a1, b1} from \'objectPattern\'', 
-// 			}),
-// 			null,
-// 			2,
-// 		),
-// 	);
-// })();
+// module.exports = 'Hello world'; module-export-default
+// exports.SimpleMessage = 'Hello world'; exports-default
+
+
+(async () => {
+  if (typeof module !== 'undefined' && require.main === module) {
+    const programAst = await acorn.ecmaParse({
+      file: 'somefakeFile.js',
+      src: `
+      const {a1, ...b1} = require(\'asd1\')
+      `, 
+    });
+  
+    console.log('ast: ',JSON.stringify(stripStartEnd(programAst) ,null, 2));
+  
+    // const test: INodeTester = (node, tree, paths, ancestors)=>{
+    //   return Array.isArray(node) 
+    //     ? false 
+    //     : node.type === "Identifier" && node.name === 'exports'
+    // }
+  
+    // const paths =  await acorn.findNodePaths(programAst, test)
+  
+    // 'ExpressionStatement[expression.operator="="][expression.left="exports"]'
+    // const selector = 'ExpressionStatement'
+    // const selected = await acorn.query(programAst,selector)
+    
+    // console.log({paths, selector})
+    // console.log('selected: ',JSON.stringify(stripStartEnd(selected),null, 2))
+  }
+})();
 
 /*
 
 {
-      "type": "ImportDeclaration",
-      "specifiers": [
-        {
-          "type": "ImportSpecifier",
-          "imported": {
-            "type": "Identifier", "name": "a1"
-          },
-          "local": {
-            "type": "Identifier", "name": "a1"
-          }
-        },
-        {
-          "type": "ImportSpecifier",
-          "imported": {
-            "type": "Identifier", "name": "b1"
-          },
-          "local": {
-            "type": "Identifier", "name": "b1"
-          }
-        }
-      ],
-      "source": {
-        "type": "Literal",
-        "value": "objectPattern",
-        "raw": "'objectPattern'"
-      }
+  "type": "ExpressionStatement",
+  "expression": {
+    "type": "AssignmentExpression",
+    "operator": "=",
+    "left": {
+      "type": "Identifier",
+      "name": "exports"
+    },
+    "right": {
+      "type": "Identifier",
+      "name": "variablename"
     }
-
-
+  }
+}
 
 */

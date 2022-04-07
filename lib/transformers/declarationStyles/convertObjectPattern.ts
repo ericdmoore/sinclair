@@ -1,11 +1,12 @@
 import * as estree from 'estree';
-import {createSelector} from '../createQuerySelector';
+import {createSelector} from '../../createQuerySelector';
+import {stripStartEnd} from '../../../tests/_utils/stripLocFrom'
 
 /**
  * Type2
  * @param node
  */
-export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.Node): estree.Node[] => {
 	/**
      *
      * ```json from> "const {a1,  b1} = require('asd1')" // note> const {a1, ...b1} = require('CAN NOT BE TRANSLATED') - may not be valid NODE.js either
@@ -72,7 +73,8 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
      * ```
      */
 
-	const decl: estree.VariableDeclarator = node.declarations.filter(d => d.type === 'VariableDeclarator')[0];
+     const n = node as estree.VariableDeclaration
+	const decl: estree.VariableDeclarator = n.declarations.filter(d => d.type === 'VariableDeclarator')[0];
 	const callEx = decl.init as estree.CallExpression;
 	const objPattern = decl.id as estree.ObjectPattern;
 
@@ -86,23 +88,42 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 			imported: (o as estree.Property).key as estree.Identifier,
 			local: (o as estree.Property).value as estree.Identifier,
 		}));
+     
+     console.log({patternedNames, objPatternProps: objPattern.properties})
 
-	const ret: estree.ImportDeclaration = {
+     const madeUpNamespaceName = `${requiredArgs.value}_ns`
+	const importing: estree.ImportDeclaration = {
 		type: 'ImportDeclaration',
-		source: requiredArgs,
-		specifiers: patternedNames,
+		specifiers: [{ type:'ImportNamespaceSpecifier', local:{ type:"Identifier",  name: madeUpNamespaceName} }],
+          source: requiredArgs,
 	};
-	return [ret];
+
+     const assigning: estree.VariableDeclaration = {
+		type: 'VariableDeclaration',
+          kind: n.kind,
+          declarations:[{
+               type: 'VariableDeclarator',
+               id: { type:'ObjectPattern', properties: objPattern.properties },
+               init: { type:'Identifier', name: madeUpNamespaceName },
+          }]
+	};
+
+	return [importing, assigning];
 };
 
-const requireWithObjecPattern = {
-	type: 'VariableDeclaration',
-	id: {
-		type: 'ObjectPattern', init: {callee: {name: 'require'}},
-	},
-};
-
-export const selector = {
-	obj: requireWithObjecPattern,
-	str: createSelector(requireWithObjecPattern),
-};
+export const testNode = (node:estree.Node | estree.Node[]):boolean=>{
+     if(Array.isArray(node) ){
+          return false
+     }else{
+          if(node.type === 'VariableDeclaration'){
+               const n = node as estree.VariableDeclaration
+               const decl0IDObjPattern = n.declarations[0]?.id?.type === 'ObjectPattern'
+               const decl0CallEx = n.declarations[0]?.init?.type === 'CallExpression'
+               const fromRequire = (n.declarations[0]?.init as any)?.callee?.name === 'require'
+               return decl0IDObjPattern && decl0CallEx && fromRequire
+                    
+          }else {
+               return false
+          }
+     }
+}

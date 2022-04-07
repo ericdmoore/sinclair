@@ -5,7 +5,7 @@ import {ITestFn, ITestCalcResult, ITestSkipped, ITestIgnored,  deepEq} from '../
 
 import * as ac from '../../../lib/sourceCode';
 // import * as acorn from 'acorn'
-import * as declarationStyles from '../../../lib/declarationStyles/index';
+import * as declarationStyles from '../../../lib/transformers/declarationStyles/index';
 import {stripStartEnd, normalSpaces} from '../../_utils/index'
 import {generate} from 'escodegen';
 import { tryStatement } from '@babel/types';
@@ -16,8 +16,8 @@ const inputSrc2 = 'let {a2} = require(\'impliedFunc\')(\'arirty1Param\')(\'arirt
 
 const buildTest = (name:string, input: string, expected:string): ITestFn => async (skip, ignore) => {
 	if(skip || ignore){ return { name, skip, ignore } as ITestSkipped | ITestIgnored}
-	const inputTree = await ac.acorn.ecmaParse({src: input, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as estree.Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: input, file: 'not-real-esmImport-test.js'});
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 
 	const convertedNodes = await declarationStyles.impliedDefaultFunction.convert(vars[0] as estree.VariableDeclaration)
 	const actual = normalSpaces(convertedNodes.map(ast => generate(ast)).join('\n'))
@@ -33,8 +33,8 @@ const buildTest = (name:string, input: string, expected:string): ITestFn => asyn
 }
 
 export const astTest: ITestFn = async (skip = false, ignore = false) => {
-	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as estree.Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'});
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 
 	const _actual = await declarationStyles.impliedDefaultFunction.convert(vars[0] as estree.VariableDeclaration);
 	const expected = [

@@ -1,12 +1,16 @@
 /* eslint-disable capitalized-comments */
 /* eslint-disable no-unused-vars */
-import type {ParsedPath} from 'path';
-// import type {Node, ExpressionStatement, AssignmentExpression} from 'estree';
+import * as estree from 'estree';
+import type { ParsedPath } from 'path';
+
+import { readFile } from 'fs/promises';
+import { resolve } from 'path';
+import { acorn } from './sourceCode'
+import { createSelector } from './createQuerySelector';
+import { apply } from './transformers/ordering/importsFirst'
 // import findDependentSourceFiles from './getFiles';
-import {readFile} from 'fs/promises';
-import {resolve} from 'path';
-import {acorn} from './sourceCode';
-import {createSelector} from './createQuerySelector';
+import pluginFns from './transformers/index'
+
 // import {query} from 'esquery';
 // import {selector} from './esmImports';
 // import { transform } from "cjstoesm";
@@ -54,28 +58,31 @@ const mountPath = (mountDir:string, p: (s:string)=> ParsedPath) => (path: string
 	const input = testLib1Path;
 	const nodeExportsCSS = createSelector({type: 'AssignmentExpression'});
 
-	const files:string[] = [
+	const filePaths:string[] = [
 		// Resolve('./tests/mock/old/lib1.js'),
-		// resolve('./tests/mock/old/crazyImports.js'),
-		resolve('./tests/mock/new/crazyImports.js'),
+		resolve('./tests/mock/old/crazyImports.js'),
+		// resolve('./tests/mock/new/crazyImports.js'),
 		// Resolve('./tests/mock/new/srcExample.js'),
 		// resolve('./node_modules/arg/index.js'),
 	];
 
-	files.forEach(async file => {
-		console.log({file});
-		console.log('\n', '\n');
+	filePaths.forEach(async file => {
+		console.log({file},'\n\n');
+
 		const tree = await acorn.ecmaParse({file});
-		console.log(JSON.stringify(tree, null, 2));
+		// console.log(JSON.stringify(tree, null, 2));
 
-		// Console.log(selector.s)
-		// query(tree as Node, selector.s).forEach((node) => console.log('>-----<\n',JSON.stringify(node, null, 2)))
+		const newBody = await pluginFns.reduce(
+			async (body, fn) => fn(await body), 
+			Promise.resolve(tree.body) as Promise<estree.Node[]>
+		) as (estree.Statement | estree.Directive | estree.ModuleDeclaration)[]
+		
+		// console.log('\n\n', 'newBody ::: ',newBody);
+		tree.body = await apply(newBody) as (estree.Statement | estree.Directive | estree.ModuleDeclaration)[]
 
-		// console.log(nodeExportsCSS)
-		// query(tree as Node, nodeExportsCSS).forEach((node) => console.log('>-----<\n',JSON.stringify(node, null, 2)))
-
-		console.log('\n', '\n');
-		console.log(await acorn.toCodeString({tree}));
+		console.log('\n\ncode ------------');
+		console.log(await acorn.toCodeString(tree));
+		console.log('------------ code');
 	});
 
 	// Correct Source Code Loop
@@ -137,4 +144,5 @@ const mountPath = (mountDir:string, p: (s:string)=> ParsedPath) => (path: string
 
 	// Console.log({defaultExports, namedExports, namedModuleExports, defaultModuleExports})
 	// printLines()(es6IMportExports)
+
 })();

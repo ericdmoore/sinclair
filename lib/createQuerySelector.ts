@@ -30,6 +30,5 @@ export const createSelector = (i: JSish, accpp: AccPP = {acc:'', pp:[] }):string
            }   
        }, accpp
    )
-
    return accumulateSelector(i,accpp).acc
 }

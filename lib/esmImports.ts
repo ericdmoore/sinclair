@@ -1,4 +1,4 @@
-import * as declarationStyles from './declarationStyles/index';
+import * as declarationStyles from './transformers/declarationStyles/index';
 
 /**
  * Supprted Patterns

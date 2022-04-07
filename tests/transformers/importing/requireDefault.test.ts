@@ -3,15 +3,15 @@
 import type {Node, VariableDeclaration} from 'estree';
 import {ITestFn, ITestCalcResult, isSubset, deepEq} from '../../tests';
 import * as ac from '../../../lib/sourceCode';
-import * as declarationStyles from '../../../lib/declarationStyles/index';
+import * as declarationStyles from '../../../lib/transformers/declarationStyles/index';
 import {generate} from 'escodegen';
 
 
 
 export const test1: ITestFn = async (skip = false, ignore = false) => {
 	const inputSrc = 'const a = require(\'asd\')';
-	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'});
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 
 	const _actual = await declarationStyles.defaults.convert(vars[0] as VariableDeclaration);
 	const expected = [
@@ -49,8 +49,8 @@ export const test1: ITestFn = async (skip = false, ignore = false) => {
 
 export const test2: ITestFn = async (skip = false, ignore = false) => {
 	const inputSrc = 'const a = require(\'asd\')';
-	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'});
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 
 	const _actual = await declarationStyles.defaults.convert(vars[0] as VariableDeclaration);
 	const expected = [

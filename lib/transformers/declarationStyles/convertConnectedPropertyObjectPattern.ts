@@ -1,13 +1,12 @@
-
 import * as estree from 'estree';
-import {createSelector} from '../createQuerySelector';
+import {stripStartEnd} from '../../../tests/_utils/stripLocFrom'
 
 /**
  * ## Convert a Connected Property for an Object Pattern
  *
  * @param node
  */
-export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
+export const convert = (node: estree.Node): estree.Node[] => {
 	/**
      * ```json require
      * {
@@ -65,8 +64,10 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
      *},
      * ```
      */
+     
+     const n = node as estree.VariableDeclaration
 
-	const declator: estree.VariableDeclarator = node.declarations
+	const declator: estree.VariableDeclarator = n.declarations
 		.filter(d => d.type === 'VariableDeclarator')[0];
 	const membEx = declator.init as estree.MemberExpression;
 	const callEx = membEx.object as estree.CallExpression;
@@ -86,7 +87,7 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 
 	const assigning:estree.VariableDeclaration = {
 		type: 'VariableDeclaration',
-		kind: node.kind,
+		kind: n.kind,
 		declarations: [
 			{
 				type: 'VariableDeclarator',
@@ -99,12 +100,30 @@ export const convert = (node: estree.VariableDeclaration): estree.Node[] => {
 	return [importing, assigning];
 };
 
-const requireWithObjecPatternandConnectedProperty = {
-	type: 'VariableDeclaration',
-	id: {init: {callee: {name: 'require'}}},
-};
+export const hasRequireFn = (n: estree.Node): boolean => {
+     switch(n.type){
+          case 'Program':
+               return n.body.some(s=>hasRequireFn(s))
+          case 'VariableDeclaration':
+               return n.declarations.some(d=>hasRequireFn(d))
+          case 'VariableDeclarator':
+               return hasRequireFn(n.init as estree.Node)
+          case 'MemberExpression':
+               return hasRequireFn(n.object as estree.Node)
+          case 'CallExpression':
+               return hasRequireFn(n.callee)
+          case 'Identifier':
+               return n.name === 'require'
+          default:
+               return false
+     }
+}
 
-export const selector = {
-	obj: requireWithObjecPatternandConnectedProperty,
-	str: createSelector(requireWithObjecPatternandConnectedProperty),
-};
+export const testNode = (node:estree.Node | estree.Node[]):boolean=>{
+     console.log('looking for connected props', JSON.stringify(stripStartEnd(node),null,2))
+     return Array.isArray(node) 
+          ? false 
+          : node.type === 'VariableDeclaration' 
+               && node.declarations[0]?.init?.type === 'MemberExpression'
+               && hasRequireFn(node.declarations[0]?.init)
+}

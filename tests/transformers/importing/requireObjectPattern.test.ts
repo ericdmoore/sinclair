@@ -4,15 +4,15 @@ import * as estree from 'estree';
 import {ITestFn, ITestCalcResult, isSubset, deepEq} from '../../tests';
 
 import * as ac from '../../../lib/sourceCode';
-import * as declarationStyles from '../../../lib/declarationStyles/index';
+import * as declarationStyles from '../../../lib/transformers/declarationStyles/index';
 import {stripStartEnd, normalSpaces} from '../../_utils/index'
 import {generate} from 'escodegen';
 
 const inputSrc = 'var {a1, b2, c3} = require(\'objectPattern\')';
 
 const buildTest = (name:string, input: string, expected:string): ITestFn => async (skip, ignore) => {
-	const inputTree = await ac.acorn.ecmaParse({src: input, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as estree.Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: input, file: 'not-real-esmImport-test.js'});
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 	// console.log(2, JSON.stringify({vars},null,2))
 
 	const convertedNodes = await declarationStyles.objectPatterns.convert(vars[0] as estree.VariableDeclaration)
@@ -31,8 +31,8 @@ const buildTest = (name:string, input: string, expected:string): ITestFn => asyn
 }
 
 export const test1: ITestFn = async (skip = false, ignore = false) => {
-	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'}) as ac.AcornRootNode;
-	const vars = await ac.acorn.query(inputTree as estree.Node, 'VariableDeclaration');
+	const inputTree = await ac.acorn.ecmaParse({src: inputSrc, file: 'not-real-esmImport-test.js'}) ;
+	const vars = await ac.acorn.query(inputTree, 'VariableDeclaration');
 	// console.log(1, JSON.stringify({vars},null,2))
 
 	const _actual = await declarationStyles.objectPatterns.convert(vars[0] as estree.VariableDeclaration);
