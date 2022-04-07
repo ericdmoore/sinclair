@@ -96,7 +96,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 ```zsh
 cd someNodeProjectjs
-deno run http://denopkg.com/ericdmoore/sinclair/mod.ts
+deno run http://denopkg.com/ericdmoore/sinclair/lib/index.ts
 ```
 
 ```zsh
