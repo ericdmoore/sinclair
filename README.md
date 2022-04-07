@@ -64,6 +64,11 @@
 
 So you started messing around with deno, cool me too. But you keep wondering how to grab some `awesome_node_modules` that you used before? Cool, me too! congratualations you and every other deno-saur have ran into the step change assumptions from @ry - and noow everythihg is better (I think),but I have all this baggage of stuff I want to bring with me to the **new world**.
 
+## Wait, but what about...
+
+- `eslint` - yeah great point... i wish I would have started that way
+   - perhaps a silver lining, it might be fun to have a deno proxy service converting 'require' packages  to convert it all to es6 on the fly.
+
 ## About The Project
 
 This project is intended to work with `denopkg.com` and `raw.githubusercontent.com` as such, the node_modules need to be made public. so that relative URL import/exports will work.
