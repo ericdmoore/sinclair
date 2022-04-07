@@ -7,7 +7,7 @@ import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { acorn } from './sourceCode'
 import { createSelector } from './createQuerySelector';
-import { apply } from './transformers/ordering/importsFirst'
+import { apply } from './transformers/ordering/importsFirstExportsLast'
 // import findDependentSourceFiles from './getFiles';
 import pluginFns from './transformers/index'
 

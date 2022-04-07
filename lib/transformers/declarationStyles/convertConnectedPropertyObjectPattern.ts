@@ -120,7 +120,7 @@ export const hasRequireFn = (n: estree.Node): boolean => {
 }
 
 export const testNode = (node:estree.Node | estree.Node[]):boolean=>{
-     console.log('looking for connected props', JSON.stringify(stripStartEnd(node),null,2))
+     // console.log('looking for connected props', JSON.stringify(stripStartEnd(node),null,2))
      return Array.isArray(node) 
           ? false 
           : node.type === 'VariableDeclaration' 

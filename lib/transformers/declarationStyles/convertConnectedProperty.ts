@@ -106,6 +106,9 @@ export const selector = {
 	str: createSelector(requireWithConnectedProperty),
 };
 
+
+
+
 export const testNode = (node:estree.Node | estree.Node[]):boolean => {
      return Array.isArray(node) 
           ? false
@@ -114,29 +117,3 @@ export const testNode = (node:estree.Node | estree.Node[]):boolean => {
 }
 
 type Dict<T> = {[key:string]:T}
-
-export const discoverNodes = async (ast: estree.Program, cfg:unknown):Promise<Dict<estree.Node | estree.Node[]>>=>{
-     return acorn.findNodePaths(ast, testNode)
-     // return paths
-}
-export const toOps = async (loc:string, oldNode: estree.Node | estree.Node[] , cfg:unknown, newNodes?:Dict<estree.Node>): Promise<Dict<patches.Operation[]>>=>{
-     return  {}
-}
-export const listOps = async (ast: estree.Program, cfg:unknown):Promise<patches.Operation[]>=>{
-     const changeThese = await discoverNodes(ast, cfg)
-     const tupleOps = (await Promise.all(
-          Object.entries(changeThese)
-               .map(async ([k,v])=>{
-                    return Object.values(await toOps(k, v, cfg))
-               })
-          )).flat(3)
-     return tupleOps
-}
-
-export default async (body: estree.Node[]): Promise<estree.Node[]> => 
-     body.reduce(async (acc, node) => {
-               return testNode(node)
-               ? [...(await acc), ...convert(node as estree.VariableDeclaration)]
-               : [...await acc, node]
-          },Promise.resolve([] as estree.Node[])
-     )
