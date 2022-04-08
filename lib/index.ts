@@ -1,6 +1,7 @@
 import * as estree from 'estree';
+import type { Stats, PathLike, Dirent} from 'fs';
 import type { ParsedPath } from 'path';
-
+import { promisify } from 'util';
 import { writeFile } from 'fs/promises';
 import { resolve } from 'path';
 import { acorn } from './sourceCode'
@@ -70,6 +71,12 @@ export const applyToFile = async (
 		return writeFile(file, src)
 }
 
-export const globToFiles = (globs:string[], fs?)=>{
+export const globToFiles = async (globs:string[], fs?: {
+		lstat: (path:PathLike)=>Promise<Stats>
+		readdir?: (path:PathLike)=>Promise<Dirent[]>
+	}):Promise<string[]> =>{
+	const lstat = fs ? fs.lstat :  (await import('node:fs/promises')).lstat
+	const readdir = fs ? fs.readdir : (await import('node:fs/promises')).readdir
 
+	return []
 }
