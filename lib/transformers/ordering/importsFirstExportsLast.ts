@@ -1,6 +1,6 @@
 import * as estree from 'estree'
 
-export const apply = async(body : estree.Node[]):Promise<estree.Node[]> => 
+export const sort = async(body : estree.Node[]):Promise<estree.Node[]> => 
     [...body].sort((a,z) => toNum(a) - toNum(z))
 
 const toNum = (node: estree.Node):number=>{
